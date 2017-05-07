@@ -99,6 +99,13 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     double delta_t = (meas_package.timestamp_ - time_us_) / 1000000.0;    //delta_t - expressed in seconds
     time_us_ = meas_package.timestamp_;
 
+    //to prevent numerical instability
+    while (delta_t > 0.2) {
+        double step = 0.1;
+        Prediction(step);
+        delta_t -= step;
+    }
+
     Prediction(delta_t);
 
     //Update state and covariance matrices
@@ -124,6 +131,12 @@ void UKF::InitializeState(MeasurementPackage meas_package) {
     } else if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
         //set the state with the initial location and zero velocity
         x_ << meas_package.raw_measurements_[0], meas_package.raw_measurements_[1], 0, 0, 0;
+    }
+
+    //this noisy measurement and represents an object at the location of the sensor.
+    if (fabs(x_[0]) <= 0.001 && fabs(x_[1]) <= 0.001) {
+        x_[0] = 0.001;
+        x_[1] = 0.001;
     }
 }
 
@@ -260,7 +273,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     NIS_radar_ = (z - z_pred).transpose() * S.inverse() * (z - z_pred);
 }
 
-double UKF::NormalizeAngle(double angle){
+double UKF::NormalizeAngle(double angle) {
     while (angle > M_PI) angle -= 2. * M_PI;
     while (angle < -M_PI) angle += 2. * M_PI;
     return angle;
@@ -398,6 +411,7 @@ void UKF::PredictRadarMeasurement(VectorXd *z_out, MatrixXd *S_out, MatrixXd *Zs
         double v1 = cos(yaw) * v;
         double v2 = sin(yaw) * v;
 
+        //todo check for cases when p_x==p_y==0
         // measurement model
         Zsig(0, i) = sqrt(p_x * p_x + p_y * p_y);                        //r
         Zsig(1, i) = atan2(p_y, p_x);                                 //phi
