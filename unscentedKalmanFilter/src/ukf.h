@@ -107,20 +107,26 @@ public:
      * Updates the state and the state covariance matrix using a radar measurement
      * @param meas_package The measurement at k+1
      */
+
     void UpdateRadar(MeasurementPackage meas_package);
 
+    void InitializeState(MeasurementPackage meas_package);
 
-    void GenerateSigmaPoints(MatrixXd *Xsig_out);
+    void InitializeCovarianceMatrix();
+
+    void InitializeWeights();
 
     void AugmentedSigmaPoints(MatrixXd *Xsig_out);
 
-    void SigmaPointPrediction(MatrixXd *Xsig_out);
+    void SigmaPointPrediction(double delta_t);
 
-    void PredictMeanAndCovariance(VectorXd *x_pred, MatrixXd *P_pred);
+    void PredictMeanAndCovariance();
 
-    void PredictRadarMeasurement(VectorXd *z_out, MatrixXd *S_out);
+    void PredictRadarMeasurement(VectorXd *z_out, MatrixXd *S_out, MatrixXd *Zsig_out);
 
-    void UpdateState(VectorXd *x_out, MatrixXd *P_out);
+    void PredictLidarMeasurement(VectorXd *z_out, MatrixXd *S_out, MatrixXd *Zsig_out);
+
+    double NormalizeAngle(double angle);
 };
 
 #endif /* UKF_H */
