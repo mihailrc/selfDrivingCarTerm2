@@ -1,84 +1,93 @@
-# CarND-Controls-PID
-Self-Driving Car Engineer Nanodegree Program
+### PID Controller Reflections
 
----
+A PID Controller continuously calculates an error value as a difference between the desired value and the measured value and continuously applies a correction based on Proportional P, Derivative D, and Integral terms I. This controller can be used to ensure a self driving car follows the desired path.
 
-## Dependencies
+#### Parameter Tuning Approach
 
-* cmake >= 3.5
- * All OSes: [click here for installation instructions](https://cmake.org/install/)
-* make >= 4.1
-  * Linux: make is installed by default on most Linux distros
-  * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
-  * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
-* gcc/g++ >= 5.4
-  * Linux: gcc / g++ is installed by default on most Linux distros
-  * Mac: same deal as make - [install Xcode command line tools]((https://developer.apple.com/xcode/features/)
-  * Windows: recommend using [MinGW](http://www.mingw.org/)
-* [uWebSockets](https://github.com/uWebSockets/uWebSockets) == 0.13, but the master branch will probably work just fine
-  * Follow the instructions in the [uWebSockets README](https://github.com/uWebSockets/uWebSockets/blob/master/README.md) to get setup for your platform. You can download the zip of the appropriate version from the [releases page](https://github.com/uWebSockets/uWebSockets/releases). Here's a link to the [v0.13 zip](https://github.com/uWebSockets/uWebSockets/archive/v0.13.0.zip).
-  * If you run OSX and have homebrew installed you can just run the ./install-mac.sh script to install this
-* Simulator. You can download these from the [project intro page](https://github.com/udacity/CarND-PID-Control-Project/releases) in the classroom.
+The parameters used in this project were found using the following steps:
+1. Experiment with various values for the Proportional value P and select the one that performs best.
+2. Keep P value fixed, experiment with various values for the Derivative parameter D and select the one that performs best.
+3. Keep P and D value, experiment with various values for the Integral parameter I and select the one that performs best.
 
-## Basic Build Instructions
+The approach was extremely simple but it worked surprisingly well.
 
-1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./pid`. 
+#### Finding P parameter
+The P parameter controls responsiveness to an error. A lower value means it takes longer to react to an error while a larger value results in a faster response but can also result in unstable behavior.
 
-## Editor Settings
+Below are the values that were attempted for P  along with general s about their performance.
+- 1.0 - becomes unstable relatively quickly and leaves the track
+- 2.0 - becomes unstable even faster. This is expected
+- 0.5 - went farther than 1.0 although it went over the ledge and recovered a few times.
+- 0.25 - seems too small to effectively control CTE. Seems like 0.5 is better.
+- 0.375 - this one was funny. Left the road, went back a bit, left the road again, then got stuck.
+- 0.625 -left the road pretty fast.
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+The value selected based on these results was P = 0.5
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+The video below the result of running the algorithm with the following parameters P=1.0, I=0.0, D=0.0. P value is too high and the car leaves the track relatively quickly.
 
-## Code Style
+[![High P Value](https://img.youtube.com/vi/H3BwvtBZtcw/0.jpg)](https://youtu.be/H3BwvtBZtcw)
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+The video below the result of running the algorithm with the following parameters P=0.5, I=0.0, D=0.0. Lowering P value made the car go farther.
 
-## Project Instructions and Rubric
+[![Optimized P Value](https://img.youtube.com/vi/C5VoHKQmkiU/0.jpg)](https://youtu.be/C5VoHKQmkiU)
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+#### Finding D parameter
+Using only the P parameter results in the algorithm oscillating around the desired value.To control these oscillations we adjusted D parameter. This has the effect of damping the oscillations with higher values resulting in faster damping. Values that were too high resulted in shaky constant steering resulting in shaky driving.
 
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
+Below are the values that were attempted for D along with general observations about their performance.
 
-## Hints!
+- 1.0 - better that just P but still not very smooth. Did not hit the ledge anymore where it used to when using only the P parameter.
+- 10 - awesome! It completed the track! Increasing D really helped and made driving pretty smooth.
+- 100 - makes the car follow the middle of the track pretty closely but is not nice to watch because
+the car is steering all the time and it makes the video look really shaky. I believe this value is too high.
+- 20 - Completes the track a few times. Drives smooth. Better than 10.
+- 40 - Completes the track a few times. Seems to be steering more than with 20.
+- 30 - Maybe a little better than 20.
 
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
+The values selected based on these results was D = 30.0
 
-## Call for IDE Profiles Pull Requests
+This video shows the result of running the algorithm with the following parameters P=0.5, I=0.0, D=1.0. Adding a derivative term makes the car drive smoother but it still leaves the track.
 
-Help your fellow students!
+[![Low D Value](https://img.youtube.com/vi/sK6HrrhuSTw/0.jpg)](https://youtu.be/sK6HrrhuSTw)
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+This video shows the result of running the algorithm with the following parameters P=0.5, I=0.0, D=30.0. The car drives much smoother and it completes the track!
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+[![Low D Value](https://img.youtube.com/vi/oxP_w9-_VdM/0.jpg)](https://youtu.be/oxP_w9-_VdM)
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
+### Finding I parameter
+The I terms takes into account both the magnitude and the duration of the error. This term compensates for bias such as steering drift because of misaligned tires. Not that a large I value results in unstable behavior because it results in applying a very large error correction.
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
+Below are the values that were attempted for I along with the general observations about their performance.
 
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+- 1.0 - not a good idea. Car left the track almost right away. Let's try something smaller.
+- 0.1 - still way too big. Car left the track quickly and seems to want to go in circles.
+- 0.01 - maybe still too big. Does not seem to help and I think is worse than with no I term.
+- 0.001 - seems to be OK. Not sure if it helps in this case.
+
+I could not decisively tell if a small I parameter helps at all so in order to confirm that I added a bias of 0.5 to the steering value. Doing this with I = 0.0 resulted in the car driving off center as shown in the video below. Parameters used were P=0.5, I=0.0 and D=30.0 with 0.5 steering bias.
+
+[![Bias with no Integral Term](https://img.youtube.com/vi/nfoXeCtF18s/0.jpg)](https://youtu.be/nfoXeCtF18s)
+
+Setting I to 0.001 resulted in the car driving in the center of the track again as shown in the video below. Parameters used were: P=0.5, I=0.001, D=30.0 and 0.5 steering bias.
+
+[![Bias with Integral Term](https://img.youtube.com/vi/G0ZgdJOga1U/0.jpg)](https://youtu.be/G0ZgdJOga1U)
+
+#### Changing throttle value
+Just for fun I also experimented with increasing throttle values to see where this approach brakes down.
+
+Here are the results of this experiments:
+ - 0.3 - this value provided in the starter code. The car drives around the track successfully reaching max speed of 32 mph.
+ - 0.5 - The car drives around the truck but it touches the red and white stripes in a couple of spots. It reaches a max speed of 48 mph.
+ - 0.6 - Driving is more erratic than at 0.5 throttle and still touches red and white stripes in a couple of spots. Reaches a max speed of 54 mph.
+ - 0.7 - Driving is even more erratic than at 0.6 throttle. Reaches a max speed of 58 mph and went off track on second lap.
+ - 0.8 - Driving fast is fun! Reaches max speed of 64 mph, touches the ledge, recovers and completes one lap. Goes of the track on the second lap.
+
+Obviously we don't want our Self Driving Car to take sharp corners at high speed. To control this it makes sense to apply brakes (negative throttle) or to reduce acceleration when the error is above a certain threshold. I did not experiment with this but I would suspect such an approach would work.
+
+#### Conclusion
+
+I found manually tuning the PID parameters to be very helpful because it helped me develop intuition about how these parameters work. An obvious alternative would be to use an algorithm that finds these parameters automatically.
+
+This was a very simple and fun project. Sometimes simplest things are the best or as Leonardo Da Vinci said "Simplicity is the ultimate sophistication".
