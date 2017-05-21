@@ -1,0 +1,41 @@
+P
+1.0 - becomes unstable relatively quickly and leaves the track
+2.0 - becomes unstable even faster as expected.
+0.5 - went farther than 1.0 although it hit the ledges a few times.
+0.25 - seems too small to effectively control CTE. Seems like 0.5 is better.
+0.375 - this one was funny. Left the road, went back a bit, left the road again, then got stuck.
+0.625 -left the road pretty fast.
+
+Value selected based on these results P = 0.5
+
+D
+1.0 - better that just P but still not very smooth. Did not hit the ledge anymore
+where it used to when using only the P parameter.
+10 - awesome. Completed the track! Increasing D really helped and made driving pretty smooth.
+100 - makes the car follow the middle of the track pretty closely but is not nice to watch because
+the car is steering all the time and it makes the video look like it is shaking.
+I believe this value is too high.
+20 - Completes the track a few times. Drives smooth. Better than 10.
+40 - Completes the track a few times. Seems to be steering more than with 20.
+30 - Maybe a little better than 20.
+
+Value selected based on these results D = 30
+
+I
+1.0 - not a good idea. Car left the track almost right away. Let's try something smaller.
+0.1 - still way too big. Car left the track quickly and seems to want to go in circles.
+0.01 - maybe still too big. Does not seem to help and I think is worse than with no I term.
+0.001 - seems to be OK. Not sure if I helps in this case. Maybe because there is no drift?
+
+Simulating drift:
+Adding a simulated drift of 0.5 makes the car drive off the center of the road to the right.
+Adding the using an I value of 0.001 re-centers the car.
+
+Value selected based on these attempts I = 0.001
+
+Increasing throttle
+0.3 - this value provided in the starter code. The car drives around the track successfully reaching max speed of 32 mph.
+0.5 - The car drives around the truck but it touches the red and white stripes in a couple of spots. It reaches a max speed of 48 mph.
+0.6 - Driving is more erratic than at 0.5 throttle and still touches red and white stripes in a couple of spots. Reaches a max speed of 54 mph.
+0.7 - Driving is even more erratic than at 0.6 throttle. Reaches a max speed of 58 mph and went off track on second lap.
+0.8 - Driving fast is fun! Reaches max speed of 64 mph, touches the ledge, recovers and completes one lap. Goes of the track on the second lap.

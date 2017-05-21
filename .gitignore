@@ -5,6 +5,9 @@
 build/
 cmake-build-debug/
 
+videos/
+*.app
+
 # editor config
 .vscode/
 
@@ -19,6 +22,9 @@ cmake-build-debug/
 !default.perspectivev3
 xcuserdata/
 *.moved-aside
+
+videos/
+*.app
 *.xccheckout
 *.xcscmblueprint
 ide_profiles/xcode/Debug/
